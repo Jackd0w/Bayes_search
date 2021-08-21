@@ -100,3 +100,26 @@ class Search():
             return 'Found in area {}'.format(area_num), coordinates
         else :
             return 'Not Found', coordinates
+
+    def revise_target_probs(self):
+        '''Update area target probabilities based on search effectivness.'''
+        denom = self.p1 * (1 - self.sep1) + self.p2 * (1 - self.sep2) + self.p3 * (1 - self.sep3)
+        self.p1 = self.p1 * (1 - self.sep1) / denom
+        self.p2 = self.p2 * (1 - self.sep2) / denom
+        self.p3 = self.p3 * (1 - self.sep3) / denom
+
+    def deaw_menu(search_num):
+        print('\nSearch {}'.format(search_num))
+        print(
+            """
+            Choose next areas to search:
+            0 - Quit
+            1 - Search Area 1 twice
+            2 - Search Area 2 twice
+            3 - Search Area 3 twice
+            4 - Search Area 1 & 2
+            5 - Search Area 1 & 3
+            6 - Search Area 2 & 3
+            7 - Start Again
+            """
+            )
