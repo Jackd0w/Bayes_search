@@ -96,7 +96,7 @@ class Search():
         coordinates = list(itertools.product(local_x_range, local_y_range))
         random.shuffle(coordinates)
         coordinates = coordinates[:int((len(coordinates) * effectivness_prob))]
-        loc_actual - (self.sailor_actual[0], self.sailor_actual[1])
+        loc_actual = (self.sailor_actual[0], self.sailor_actual[1])
         if area_num == self.area_actual and loc_actual in coordinates:
             return 'Found in area {}'.format(area_num), coordinates
         else :
@@ -189,12 +189,12 @@ def main() :
 
             print("\nSearch {} Results 1 = {}".format(search_num, results_1), file=sys.stderr)
             print("Search {} Results 2 = {}\n".format(search_num, results_2), file=sys.stderr)
-            print("Search {} Effectivness (E):".fromat(search_num))
-            print("E1 = {:,3f}, E2 = {:.3f}, E3 = {:.3f}".fromat(app.p1, app.p2, app.p3))
+            print("Search {} Effectivness (E):".format(search_num))
+            print("E1 = {:.3f}, E2 = {:.3f}, E3 = {:.3f}".format(app.p1, app.p2, app.p3))
 
             if results_1 == 'Not Found' and results_2 == 'Not Found':
-                print("\nNew Target Probabilities (P) for Search {}:".fromat(search_num + 1))
-                print("P1 = {:.3f}, P2 = {:.3f}, P3 = {:.3f}".fromat(app.p1, app.p2, app.p3))
+                print("\nNew Target Probabilities (P) for Search {}:".format(search_num + 1))
+                print("P1 = {:.3f}, P2 = {:.3f}, P3 = {:.3f}".format(app.p1, app.p2, app.p3))
             else:
                 cv.circle(app.img, (sailor_x, sailor_y), 3, (255, 0, 0), -1)
                 cv.imshow('Search Area', app.img)
