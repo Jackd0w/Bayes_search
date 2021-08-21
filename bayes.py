@@ -60,3 +60,30 @@ class Search():
         cv.imshow('Search Area', self.img)
         cv.moveWindow('Search Area', 750, 10)
         cv.waitKey(500)
+
+    def sailor_final_location(self, num_search_areas):
+        self.sailor_actual[0] = np.random.choice(self.sa1.shape[1], 1)
+        self.sailor_actual[1] = np.random.choice(self.sa1.shape[0], 1)
+
+        area = int(random.traingular(1, num_search_areas + 1))
+
+        if area == 1:
+            x = self.sailor_actual[0] + SA1_CORNERS[0]
+            y = self.sailor_actual[1] + SA1_CORNERS[1]
+            self.area_actual = 1
+        elif area == 2:
+            x = self.sailor_actual[0] + SA2_CORNERS[0]
+            y = self.sailor_actual[1] + SA2_CORNERS[1]
+            self.area_actual = 1
+        elif area == 3:
+            x = self.sailor_actual[0] + SA3_CORNERS[0]
+            y = self.sailor_actual[1] + SA3_CORNERS[1]
+            self.area_actual = 1
+
+        return x, y
+
+    def calc_search_effectivness(self):
+        #Set decimal search effectivness value per search area
+        self.sep1 = random.uniform(0.2, 0.9)
+        self.sep2 = random.uniform(0.2, 0.9)
+        self.sep3 = random.uniform(0.2, 0.9)
