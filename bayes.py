@@ -3,11 +3,12 @@ import itertools
 import random
 import numpy as np
 import cv2 as cv
+from numpy.lib.type_check import imag
 
 MAP_FILE = 'map.png'
-SA1_CORNER = (130, 265, 180, 315)
-SA2_CORNER = (80, 255, 130, 305)
-SA3_CORNER = (105, 205, 155, 255)
+SA1_CORNERS = (130, 265, 180, 315)
+SA2_CORNERS = (80, 255, 130, 305)
+SA3_CORNERS = (105, 205, 155, 255)
 
 
 class Search():
@@ -23,11 +24,11 @@ class Search():
         self.sailor_actual = [0, 0] #local coordinates search area
         
         self.sa1 = self.img[SA1_CORNERS[1] : SA1_CORNERS[3],
-                            SA1_CORNERS[0] : SA1_CORNERS[4]]
+                            SA1_CORNERS[0] : SA1_CORNERS[2]]
         self.sa2 = self.img[SA2_CORNERS[1] : SA2_CORNERS[3],
-                            SA2_CORNERS[0] : SA2_CORNERS[4]]
+                            SA2_CORNERS[0] : SA2_CORNERS[2]]
         self.sa3 = self.img[SA3_CORNERS[1] : SA3_CORNERS[3],
-                            SA3_CORNERS[0] : SA3_CORNERS[4]]
+                            SA3_CORNERS[0] : SA3_CORNERS[2]]
 
         self.p1 = 0.2
         self.p2 = 0.5
@@ -46,9 +47,9 @@ class Search():
         cv.putText(self.img, '50 Nautical Miles ', (71, 370), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 0))
 
         cv.rectangle(self.img, (SA1_CORNERS[1], SA1_CORNERS[3],
-                                SA1_CORNERS[0], SA1_CORNERS[4]), (0, 0, 0), 1)
+                                SA1_CORNERS[0], SA1_CORNERS[2]), (0, 0, 0), 1)
         cv.putText(self.img, '1', (SA1_CORNERS[0]+3, SA1_CORNERS[1] + 15), cv.FONT_HERSHEY_PLAIN, 1, 0)
-        cv.rectangle(self.ingm (SA2_CORNERS[0], SA2_CORNERS[1]), (SA2_CORNERS[2], SA2_CORNERS[3]), (0, 0, 0), 1)
+        cv.rectangle(self.img, (SA2_CORNERS[0], SA2_CORNERS[1]), (SA2_CORNERS[2], SA2_CORNERS[3]), (0, 0, 0), 1)
         cv.putText(self.img, '2', (SA2_CORNERS[0] + 3, SA2_CORNERS[1] + 15), cv.FONT_HERSHEY_PLAIN, 1, 0)
         cv.rectangle(self.img, (SA3_CORNERS[0], SA3_CORNERS[1]), (SA3_CORNERS[2], SA3_CORNERS[3]), (0, 0, 0), 1)
         cv.putText(self.img, '3', (SA3_CORNERS[0] + 3, SA3_CORNERS[1] + 15), cv.FONT_HERSHEY_PLAIN, 1, 0)
@@ -65,7 +66,7 @@ class Search():
         self.sailor_actual[0] = np.random.choice(self.sa1.shape[1], 1)
         self.sailor_actual[1] = np.random.choice(self.sa1.shape[0], 1)
 
-        area = int(random.traingular(1, num_search_areas + 1))
+        area = int(random.triangular(1, num_search_areas + 1))
 
         if area == 1:
             x = self.sailor_actual[0] + SA1_CORNERS[0]
@@ -108,7 +109,7 @@ class Search():
         self.p2 = self.p2 * (1 - self.sep2) / denom
         self.p3 = self.p3 * (1 - self.sep3) / denom
 
-    def deaw_menu(search_num):
+    def draw_menu(search_num):
         print('\nSearch {}'.format(search_num))
         print(
             """
@@ -123,3 +124,84 @@ class Search():
             7 - Start Again
             """
             )
+
+def main() :
+        app = Search('Greenland')
+        app.draw_map(last_known=(160, 290))
+        sailor_x, sailor_y = app.sailor_final_location(num_search_areas=3)
+        print("-" * 65)
+        print("\nInitial Target (P) Probabilities:")
+        print("P1 = {:.3f}, P2 = {:.3f}".format(app.p1, app.p1, app.p3))
+        search_num = 1
+
+
+        while True:
+            app.calc_search_effectivness()
+            #draw_menu(search_num)
+            choice = input("Choice: ")
+
+            if choice == 0:
+                sys.exit()
+        
+            elif choice == "1":
+                results_1, coordinates_1 = app.conduct_search(1, app.sa1, app.sep1)
+                results_2, coordinates_2 = app.conduct_search(1, app.sa1, app.sep1)
+                app.sep1 = (len(set(coordinates_1 + coordinates_2))) / (len(app.sa1)**2)
+                app.sep2 = 0
+                app.sep3 = 0
+
+            elif choice == "2":
+                results_1, coordinates_1 = app.conduct_search(2, app.sa2, app.sep2)
+                results_2, coordinates_2 = app.conduct_search(2, app.sa2, app.sep2)
+                app.sep1 = 0
+                app.sep2 = (len(set(coordinates_1 + coordinates_2))) / (len(app.sa2)**2)
+                app.sep3 = 0
+
+            elif choice == "3":
+                results_1, coordinates_1 = app.conduct_search(3, app.sa3, app.sep3)
+                results_2, coordinates_2 = app.conduct_search(3, app.sa3, app.sep3)
+                app.sep1 = 0
+                app.sep2 = 0
+                app.erp3 = (len(set(coordinates_1 + coordinates_2)))/(len(app.sa3)**2)
+        
+            elif choice == "4":
+                results_1, coordinates_1 = app.conduct_search(1, app.sa1, app.sep1)
+                results_2, coordinates_2 = app.conduct_search(2, app.sa2, app.sep2)
+                app.sep3 = 0
+
+            elif choice == "5":
+                results_1, coordinates_1 = app.conduct_search(1, app.sa1, app.sep1)
+                results_2, coordinates_2 = app.conduct_search(3, app.sa3, app.sep3)
+                app.sep2 = 0
+
+
+            elif choice == "6":
+                results_1, coordinates_1 = app.conduct_search(2, app.sa2, app.sep2)
+                results_2, coordinates_2 = app.conduct_search(3, app.sa3, app.sep3)
+                app.sep1 = 0
+        
+            elif choice == "7":
+                main()
+
+            else:
+                print("\nSorry, but that isn't a valid choice.", file=sys.stderr)
+            app.revise_target_probs()
+
+            print("\nSearch {} Results 1 = {}".format(search_num, results_1), file=sys.stderr)
+            print("Search {} Results 2 = {}\n".format(search_num, results_2), file=sys.stderr)
+            print("Search {} Effectivness (E):".fromat(search_num))
+            print("E1 = {:,3f}, E2 = {:.3f}, E3 = {:.3f}".fromat(app.p1, app.p2, app.p3))
+
+            if results_1 == 'Not Found' and results_2 == 'Not Found':
+                print("\nNew Target Probabilities (P) for Search {}:".fromat(search_num + 1))
+                print("P1 = {:.3f}, P2 = {:.3f}, P3 = {:.3f}".fromat(app.p1, app.p2, app.p3))
+            else:
+                cv.circle(app.img, (sailor_x, sailor_y), 3, (255, 0, 0), -1)
+                cv.imshow('Search Area', app.img)
+                cv.waitKey(1500)
+                main()
+            search_num += 1
+
+if __name__ == '__main__':
+    main() 
+
